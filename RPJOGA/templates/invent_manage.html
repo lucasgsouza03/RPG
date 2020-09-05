@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<title>Inventory Manger</title>
+        <meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+	</head>
+	<body>
+        <center><h1>Inventory Manager</h1>
+        <div class="main_box">
+            <div class="char_invent">
+            {% for char in chars %}
+            <div class="log_box">
+                {{ char.nome }}
+                <div class="log_box">
+                    <table>
+                    {% for item in items %}
+                        {% if item.char_id == char.id %}
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <tr>
+                                <td style="color: black;">QTD:</td><td style="color: black;"><input type="number" value="{{ item.qtd }}" name="qtd"></td><td style="color: black;">item:</td><td style="color: black;">{{ item.nome }}</td><td style="color: black;"><button name="update" type="submit" value="{{ item.id }}">update</button></td><td style="color: black;"><button name="delete" type="submit" value="{{ item.id }}">Delete</button></td>
+                            </tr>
+                        </form>
+                        {% endif %}
+                    {% endfor %}
+                    </table>
+                </div>
+                    <table>
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <tr>
+                            <td style="color: black;">QTD:</td><td style="color: black;"><input type="number" name="qtd"></td><td style="color: black;">item:</td><td style="color: black;"><input type="text" name="nome"></td><td style="color: black;"><button name="new" type="submit" value="{{ char.nome }}">New</button></td>
+                        </tr>
+                    </form>
+                    </table>
+            </div>
+
+            {% endfor %}
+            </div>
+        </div>
+        </center>
+    </body>
+</html>

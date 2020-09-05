@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Cadastro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+</head>
+<body>
+    <center><h1>Crie o inimigo</h1></center>
+        <div class="char">
+            <center>
+            <form method="POST" action="" id="form_char">
+            {% csrf_token %}
+                <table>
+                    <tr>
+                        <td></td><td>Nome:</td><td> <input type="text" name="nome" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>HP:</td><td> <input type="number" name="hp" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Invocador:</td><td><select name="char" style="width:100%;">
+                                                            <option></option>
+                                                            {% for char in chars %}
+                                                                <option value="{{ char.id }}">{{ char.nome }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Skill de invocação:</td><td><select name="skill" style="width:100%;">
+                                                                    <option></option>
+                                                                    {% for skill in skills %}
+                                                                        {% if skill.tipo == "summon" %}
+                                                                            <option value="{{ skill.id }}">{{ skill.nome }}</option>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td> <button type="submit">Go</button> </td>
+                    </tr>
+                </table></center>
+            </form>
+        </div>
+        
+    </div>
+</body>
+</html>

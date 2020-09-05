@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Cadastro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <script>
+function myFunction(){
+    var x = document.getElementById("inimigo");
+    var y = document.getElementById("aliado");
+    var z = document.getElementById("minion");
+    if (document.getElementById('rdbinimigo').checked){
+        x.style.display = "table-row";
+        y.style.display = "none";
+        z.style.display = "none";
+    } else if (document.getElementById('rdbaliado').checked){
+        x.style.display = "none";
+        y.style.display = "table-row";
+        z.style.display = "none";
+    } else if (document.getElementById('rdbminion').checked){
+        x.style.display = "none";
+        y.style.display = "none";
+        z.style.display = "table-row";
+    }
+    
+}
+    </script>
+</head>
+<body>
+    <center><h1>Cadastre as skills</h1></center>
+        <div class="char">
+            <center>
+            <form method="POST" action="" id="form_char">
+            {% csrf_token %}
+                <table>
+                    <tr>
+                        <td></td><td>Nome:</td><td> <input type="text" name="nome" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Identificador:</td><td> <input type="text" name="identificador" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Cooldown:</td><td> <input type="number" value="0" name="cd" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Duração:</td><td> <input type="number" value="0" name="duracao" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Redução:</td><td> <input type="number" value="0" name="reduc" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Numero de usos:</td><td> <input type="number" value="0" name="max_use" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Dano:</td><td> <input type="number" value="0" name="dano" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Dano bônus:</td><td> <input type="number" value="0" name="dano_bonus" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Custo bônus:</td><td> <input type="number" value="0" name="cost_bonus" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Custo de estamina:</td><td> <input type="number" value="0" name="estamina" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Tipo:</td><td> <select name="tipo">
+                                                        <option></option>
+                                                        <option>ativa</option>
+                                                        <option>passiva</option>
+                                                        <option>skill</option>
+                                                        <option>reduc</option>
+                                                        <option>summon</option>
+                                                    </select>
+                                                </td>
+                    </tr>
+                    <tr>
+                        <td></td><td><label>Aliado:<input type="radio" name="rdb" onclick="myFunction()" id="rdbaliado" class="input"/></label><label> Inimigo:<input type="radio" name="rdb" onclick="myFunction()" id="rdbinimigo" class="input"/></label><td><label>Minion:<input type="radio" name="rdb" onclick="myFunction()" id="rdbminion" class="input"/></label></td>
+                    </tr>
+                    <tr id="aliado" style="display:none;">
+                        <td></td><td>Dono da skill(aliado):</td><td><select name="aliado">
+                                                                <option></option>
+                                                                {% for char in chars %}
+                                                                    <option value="{{ char.id }}">{{ char.nome }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                    </tr>
+                    <tr id="inimigo" style="display:none;">
+                        <td></td><td>Dono da skill(inimigo):</td><td><select name="inimigo">
+                                                                <option></option>
+                                                                {% for enemy in enemys %}
+                                                                    <option value="{{ enemy.id }}">{{ enemy.nome }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                    </tr>
+                    <tr id="minion" style="display:none;">
+                        <td></td><td>Dono da skill(minion):</td><td><select name="minion">
+                                                                <option></option>
+                                                                {% for minion in minions %}
+                                                                    <option value="{{ minion.id }}">{{ minion.nome }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td> <button type="submit">Go</button> </td>
+                    </tr>
+                </table></center>
+            </form>
+        </div>
+        
+    </div>
+</body>
+</html>

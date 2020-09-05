@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Cadastro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+</head>
+<body>
+    <center><h1>Crie o inimigo</h1></center>
+        <div class="char">
+            <center>
+            <form method="POST" action="" id="form_char">
+            {% csrf_token %}
+                <table>
+                    <tr>
+                        <td></td><td>Nome:</td><td> <input type="text" name="nome" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>HP:</td><td> <input type="number" name="hp" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Esquiva:</td><td><select name="esquiva" style="width:100%;"><option></option><option>sim</option><option>nao</option></td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Block:</td><td><select name="block" style="width:100%;"><option></option><option>sim</option><option>nao</option></td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Dado Minimo:</td><td> <input type="number" name="dmin" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td> <button type="submit">Go</button> </td>
+                    </tr>
+                </table></center>
+            </form>
+        </div>
+        
+    </div>
+</body>
+</html>

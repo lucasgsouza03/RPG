@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<title>Perfil</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+	</head>
+	<body>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <input type="submit" name="EndFight" value="End">
+        </form>
+        <center>
+        <div>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <h1>DANO AOE</h1>
+                <input class="input" type="number" name="aoe">
+                <input type="submit" name="EndFight" value="End">
+            </form>
+        </div>
+        </center>
+        <center><h1>Perfis</h1></center>
+        <div class="main_box">
+            {% for perfil in perfis %}
+            <div class="char">
+                <center>
+                <h2>{{ perfil.nome }}</h2>
+                <form method="POST" action="">
+                {% csrf_token %}
+                    <table>
+                        <tr>
+                            <td></td><td class="hp">HP:</td><td class="hp"> {{ perfil.hp }}/{{perfil.base_hp}} </td>
+                        </tr>    
+                            <td></td><td class="estamina">Estamina:</td><td class="estamina"> {{ perfil.estamina }}/{{perfil.base_estamina}} </td>
+                        <tr>
+                            <td></td><td>Força:</td><td class="num"> {{ perfil.forca }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Habilidade:</td><td class="num"> {{ perfil.habilidade }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Agilidade:</td><td class="num"> {{ perfil.agilidade }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Destreza:</td><td class="num"> {{ perfil.dex }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Inteligencia:</td><td class="num"> {{ perfil.inteligencia }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Força de Vontade:</td><td class="num"> {{ perfil.forc_vont }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Dado Minimo:</td><td class="num"> {{ perfil.dmin }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Esquiva:</td><td> <select name="esquiva" style="width:100%;"><option></option><option>s</option><option>n</option></td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Block:</td><td><select name="block" style="width:100%;"><option></option><option>s</option><option>n</option></td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Ação:</td><td><select name="action" style="width:100%;"><option></option><option>atacar</option><option>descanso</option></td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Perda de estamina:</td><td> <input type="number" name="perda" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Cura:</td><td> <input type="number" name="cura" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Dano:</td><td> <input type="number" name="dano" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td> <button name="char" type="submit" value="{{ perfil.nome }}">Go</button> </td>
+                        </tr>
+                    </table></center>
+                </form>
+            </div>
+            {% endfor %}
+            
+        </div>
+        
+        <br><br>
+        <center><h1>Minions</h1></center>
+        <br><br>
+
+        <div class="main_box">
+            {% for minion in minions %}
+            <div class="char">
+                <center>
+                <h2>{{ minion.nome }}</h2>
+                <form method="POST" action="">
+                {% csrf_token %}
+                    <table>
+                        <tr>
+                            <td></td><td class="hp">HP:</td><td class="hp"> {{ minion.hp }}/{{minion.base_hp}} </td>
+                        </tr>    
+                        <tr>
+                            <td></td><td>Dano:</td><td> <input type="number" name="dano" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Cura:</td><td> <input type="number" name="cura" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td> <button name="minion" type="submit" value="{{ minion.id }}">Go</button> </td>
+                        </tr>
+                    </table></center>
+                </form>
+            </div>
+            {% endfor %}
+            
+        </div>
+
+        <br><br><br><br><br><br>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <center><input type="submit" name="EndTurn" class="end" value="End_Turn"></center>
+        </form>
+    </body>
+</html>

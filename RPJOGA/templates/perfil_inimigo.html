@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<title>Perfil Inimigo</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+	</head>
+	<body>
+        <div style="color:white; margin-left:1%">Load enemy
+        <form method="POST" action="">
+                {% csrf_token %}
+                <select name="load">
+                    <option></option>
+                    {% for enemy in enemys %}
+                        <option value="{{ enemy.id }}">{{ enemy.nome }}</option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="num" style="width:2%;" class="input"/>
+                <input type="submit" value="carregar">
+            </form>
+        </div>
+        <center><h1>Perfis</h1></center>
+        <div class="main_box">
+            
+            {% for perfil in perfis %}
+            <div class="char">
+                <center>
+                <h2>{{ perfil.nome }}</h2>
+                <form method="POST" action="">
+                {% csrf_token %}
+                    <table>
+                        <tr>
+                            <td></td><td class="hp">HP:</td><td class="hp"> {{ perfil.hp }}/{{perfil.hp_base}} </td>
+                        </tr>    
+                        <tr>
+                            <td></td><td>Esquiva:</td><td class="num"> {{ perfil.esquiva }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Block:</td><td class="num"> {{ perfil.block }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Dado minimo:</td><td class="num"> {{ perfil.dmin }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Cura:</td><td> <input type="number" name="cura" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Dano:</td><td> <input type="number" name="dano" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td> <button name="inimigo" type="submit" value="{{ perfil.id }}">Go</button> </td>
+                        </tr>
+                        <input type="hidden" name="ident" value="{{ perfil.id }}">
+                    </table>
+                    <br>
+                    <table>
+                        <tr>
+                            <td><input type="submit" name="dado" value="6"></td><td><input type="submit" name="dado" value="10"></td><td><input type="submit" name="dado" value="15"></td><td><input type="submit" name="dado" value="20"></td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <td></td><td></td><td colspan="2">RESULTADO:  {{ perfil.dresult }}</td>
+                        </tr>
+                    </table>
+                </center>
+                </form>
+            </div>
+            {% endfor %}
+            
+        </div>
+    </body>
+</html>

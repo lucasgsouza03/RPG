@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Cadastro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    a{
+        color: white; 
+        font-weight: bold; 
+        text-decoration:none; 
+        text-shadow:-3px -3px #000;
+        font-size: 3vw;
+    }
+    tr, td{
+        border: 3px solid black;
+        border-radius: 10px;
+        text-align: center;
+    }
+    div{
+        width:40%;
+    }
+    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+</head>
+<body>
+    <center>
+    <div class="char">
+        <table>
+            <tr><td><a href="/perfil/" >perfil</a></td><td><a href="/enemy/" >enemy</a></td></tr>
+            <tr><td><a href="/perfil_inimigo/" >perfil_inimigo</a></td><td><a href="/logs/" >logs</a></td></tr>
+            <tr><td><a href="/invent_manage/" >invent_manage</a></td></tr>
+        </table>
+    </div>
+    </center>
+</body>
+</html>

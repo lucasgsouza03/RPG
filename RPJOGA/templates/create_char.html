@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Cadastro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+</head>
+<body>
+    <center><h1>Crie seu personagem</h1></center>
+        <div class="char">
+            <center>
+            <form method="POST" action="" id="form_char">
+            {% csrf_token %}
+                <table>
+                    <tr>
+                        <td></td><td>Nome:</td><td> <input type="text" name="nome" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>ID:</td><td> <input type="text" name="identificador" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Força:</td><td> 
+                                                    <select name="forca" form="form_char">
+                                                        <option>0</option>
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                    </select> 
+                                                </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Habilidade:</td><td> 
+                                                        <select name="habilidade">
+                                                            <option>0</option>
+                                                            <option>1</option>
+                                                            <option>2</option>
+                                                            <option>3</option>
+                                                            <option>4</option>
+                                                            <option>5</option>
+                                                            <option>6</option>
+                                                        </select> 
+                                                    </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Agilidade:</td><td> 
+                                                        <select name="agilidade">
+                                                            <option>0</option>
+                                                            <option>1</option>
+                                                            <option>2</option>
+                                                            <option>3</option>
+                                                            <option>4</option>
+                                                            <option>5</option>
+                                                            <option>6</option>
+                                                        </select> 
+                                                    </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Dex:</td><td> 
+                                                    <select name="dex">
+                                                        <option>0</option>
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                    </select> 
+                                                </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Inteligência:</td><td> 
+                                                            <select name="inteligencia">
+                                                                <option>0</option>
+                                                                <option>1</option>
+                                                                <option>2</option>
+                                                                <option>3</option>
+                                                                <option>4</option>
+                                                                <option>5</option>
+                                                                <option>6</option>
+                                                            </select> 
+                                                        </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Força de vontade:</td><td> 
+                                                                <select name="forc_vont">
+                                                                    <option>0</option>
+                                                                    <option>1</option>
+                                                                    <option>2</option>
+                                                                    <option>3</option>
+                                                                    <option>4</option>
+                                                                    <option>5</option>
+                                                                    <option>6</option>
+                                                                </select> 
+                                                            </td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Dado Minimo:</td><td> <input type="number" name="dmin" class="input"/> </td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td> <button type="submit">Go</button> </td>
+                    </tr>
+                </table></center>
+            </form>
+        </div>
+        
+    </div>
+</body>
+</html>

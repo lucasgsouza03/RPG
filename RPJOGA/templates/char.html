@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>RPJOGA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+    <style>
+        a{
+            font-size: 3vw;
+            }
+    </style>
+</head>
+<body>
+        <center>
+    <div class="char" style="width: 30%; ">
+        {% for char in chars %}
+            <a href="/perfil/{{char.identificador}}/detalhes/" style="color: white; font-weight: bold; text-decoration:none; text-shadow:4px 4px #000;">{{char}}</a>
+            <br><br><br>
+        {% endfor %}
+    </div>
+</body>
+</html>

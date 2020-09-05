@@ -1,0 +1,247 @@
+{% load static %}
+{% load tags %}
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<title>perfil</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="10">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">	
+	</head>
+	<body>
+        <center>
+        <h1>Perfis</h1>
+        <div class="main_box2">
+            <div class="detalhe">
+                <h2>{{ perfil.nome }}</h2>
+                
+                {% csrf_token %}
+                    <table>
+                        <tr>
+                            <td></td><td class="hp">HP:</td><td class="hp"> {{ perfil.hp }}/{{perfil.base_hp}} </td>
+                        </tr>    
+                            <td></td><td class="estamina">Estamina:</td><td class="estamina"> {{ perfil.estamina }}/{{perfil.base_estamina}} </td>
+                        <tr>
+                            <td></td><td>Força:</td><td class="num"> {{ perfil.forca }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Habilidade:</td><td class="num"> {{ perfil.habilidade }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Agilidade:</td><td class="num"> {{ perfil.agilidade }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Destreza:</td><td class="num"> {{ perfil.dex }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Inteligencia:</td><td class="num"> {{ perfil.inteligencia }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Força de Vontade:</td><td class="num"> {{ perfil.forc_vont }} </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Dado Minimo:</td><td class="num"> {{ perfil.dmin }} </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="invent">
+                    <div class="skills_passiva">
+                        <p style="color:white; font-weight:bold;">PASSIVAS: </p>
+                        {% for skill in skills %}
+                            {% if skill.tipo == "passiva" %}
+                                <label class="skill_passiva">
+                                    {{ skill.nome }}
+                                </label>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+    
+    
+                    <div style="width:90%;">
+                    <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="skills">
+                        {% for skill in skills %}
+                        {% if skill.tipo == "skill" or skill.tipo == "summon" %}
+                            <div class="skill">
+                                <label>
+                                    <b style="color:rgb(92, 81, 81)">{{skill.nome}}</b>
+                                    <br>
+                                    {% if skill.dano < 0 %}
+                                        <b style="color:rgb(247, 148, 148);">Cura: ({{ skill.dano | positivo }})</b>
+                                        
+                                    {% else %}
+                                        <b style="color:rgb(175, 4, 4);">Dano: ({{ skill.dano }})</b>
+                                    {% endif %}
+                                    <br>
+                                        <b style="color:rgb(4, 175, 4);">Estamina: ({{ skill.estamina }})</b>
+                                    <br>
+                                    {% if skill.max_use > 0 and skill.max_use_corrent > 0 %}
+                                        {% if skill.duracao_corrent == 20 and skill.cd_corrent > 0 %}
+                                            <b style="color:rgb(250, 124, 6);">Invocado!</b>
+                                        {% elif skill.duracao_corrent > 0 and skill.cd_corrent > 0 %}
+                                            <b style="color:blue;">Duração: {{ skill.duracao_corrent }}</b>
+                                        {% elif skill.cd_corrent > 0 and skill.duracao_corrent == 0 %}
+                                            <b style="color:rgb(161, 78, 78);">Cooldown: {{ skill.cd_corrent }}</b>
+                                        {% elif skill.cd_corrent == 0 %}
+                                        <b style="color:rgb(4, 175, 4);">Ready</b>
+                                        <br>
+                                        <input type="radio" name="skill" value="{{ skill.id }},{{ skill.identificador }}">
+                                        {% endif %}
+                                    {% elif skill.max_use > 0 and skill.max_use_corrent == 0  %}
+                                        {% if skill.duracao_corrent == 20 and skill.cd_corrent > 0 %}
+                                            <b style="color:rgb(250, 124, 6);">Invocado!</b>
+                                        {% else %}
+                                            <b style="color:rgb(252, 0, 0);">Cooldown: Unable</b>
+                                        {% endif %}
+                                    {% elif skill.max_use == 0 %}
+                                        {% if skill.duracao_corrent == 20 and skill.cd_corrent > 0 %}
+                                            <b style="color:rgb(250, 124, 6);">Invocado!</b>
+                                        {% elif skill.duracao_corrent > 0 and skill.cd_corrent > 0 %}
+                                            <b style="color:blue;">Duração: {{ skill.duracao_corrent }}</b>
+                                        {% elif skill.cd_corrent > 0 and skill.duracao_corrent == 0 %}
+                                            <b style="color:rgb(161, 78, 78);">Cooldown: {{ skill.cd_corrent }}</b>
+                                        {% elif skill.cd_corrent == 0 %}
+                                        <b style="color:rgb(4, 175, 4);">Ready</b>
+                                        <br>
+                                        <input type="radio" name="skill" value="{{ skill.id }},{{ skill.identificador }}">
+                                        {% endif %}
+                                    {% endif %}
+                                </label>
+                            
+                            {% if vali != null %}
+                                {% if skill.tipo == "skill" %}
+                                    <br><label><input type="checkbox" name="bonus" value="{{ skill.id }}"><b style="color:rgb(252, 0, 0);">Bônus Igni</b>
+                                    <br>
+                                    ({{ skill.bonus_cost }})
+                                    </label>
+                                {% endif %}
+                            {% endif %}
+                            </div>
+                        {% endif %}
+                        {% endfor %}
+                    <div class="skills_reduc">
+                        <p style="color:white; font-weight:bold;">ATIVA: </p>
+                        {% for skill in skills %}
+                            {% if skill.tipo == "reduc" or skill.tipo == "ativa" %}
+                                {% if skill.tipo == "reduc" %}
+                                    <label class="skill">
+                                        <div style="display: block">
+                                            <b style="color:rgb(92, 81, 81)">{{skill.nome}}</b>
+                                            <br>
+                                            <input type="checkbox" name="reduc" value="{{ skill.reduc }}">
+                                        </div>
+                                    </label>
+                                {% endif %}
+                                {% if skill.tipo == "ativa" %}
+                                    <button type="submit" name="ativa" value="{{skill.id}}">{{ skill.nome }}</button>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for debuf in debufs %}
+                            {% if debuf.nome == "maldição" and debuf.duracao > 0  %}
+                                <label class="skill">
+                                    <div style="display: block">
+                                        <b style="color:rgb(92, 81, 81)">{{debuf.nome}}</b>
+                                        <br>
+                                        <input type="checkbox" name="debuf" value="{{ debuf.id }}">
+                                    </div>
+                                </label>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    </div>
+                    
+                    <table>
+                        <tr>
+                            <td><input type="submit" name="dado" value="6"></td><td><input type="submit" name="dado" value="10"></td><td><input type="submit" name="dado" value="15"></td><td><input type="submit" name="dado" value="20"></td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <td></td><td></td><td colspan="2">RESULTADO:  {{ resultado }}</td>
+                        </tr>
+                    </table>
+                    </div>
+                    </div>
+                </form>    
+                </div>
+            </div>
+            <br>
+            {% for minion in minions %}
+            <div class="main_box2">
+                <div class="detalhe">
+                    <h2>{{ minion.nome }}</h2>
+                    
+                    {% csrf_token %}
+                        <table>
+                            <tr>
+                                <td></td><td class="hp">HP:</td><td class="hp"> {{ minion.hp }}/{{minion.base_hp}} </td>
+                            </tr>    
+                        </table>
+                        <div style="width:90%;">
+                            <form method="POST" action="">
+                            {% csrf_token %}
+                            <div class="skills">
+                                {% for minion_skill in minion_skills %}
+                                {% if minion_skill.minion_id == minion.minion_id %}
+                                {% if minion_skill.tipo == "skill" or minion_skill.tipo == "summon" %}
+                                    <label class="minion_skill">
+                                        <b style="color:rgb(92, 81, 81)">{{minion_skill.nome}}</b>
+                                        <br>
+                                        {% if minion_skill.max_use > 0 and minion_skill.max_use_corrent > 0 %}
+                                            {% if minion_skill.duracao_corrent > 0 and minion_skill.cd_corrent > 0 %}
+                                                <b style="color:blue;">Duração: {{ minion_skill.duracao_corrent }}</b>
+                                            {% elif minion_skill.cd_corrent > 0 and minion_skill.duracao_corrent == 0 %}
+                                                <b style="color:rgb(161, 78, 78);">Cooldown: {{ minion_skill.cd_corrent }}</b>
+                                            {% elif minion_skill.cd_corrent == 0 %}
+                                            <b style="color:rgb(4, 175, 4);">Ready</b>
+                                            <br>
+                                            <input type="radio" name="skill" value="{{ minion_skill.id }},{{ minion_skill.identificador }}">
+                                            {% endif %}
+                                        {% elif minion_skill.max_use > 0 and minion_skill.max_use_corrent == 0  %}
+                                            <b style="color:rgb(252, 0, 0);">Cooldown: Unable</b>
+                                        {% elif minion_skill.max_use == 0 %}
+                                            {% if minion_skill.duracao_corrent > 0 and minion_skill.cd_corrent > 0 %}
+                                                <b style="color:blue;">Duração: {{ minion_skill.duracao_corrent }}</b>
+                                            {% elif minion_skill.cd_corrent > 0 and minion_skill.duracao_corrent == 0 %}
+                                                <b style="color:rgb(161, 78, 78);">Cooldown: {{ minion_skill.cd_corrent }}</b>
+                                            {% elif minion_skill.cd_corrent == 0 %}
+                                            <b style="color:rgb(4, 175, 4);">Ready</b>
+                                            <br>
+                                            <input type="radio" name="skill" value="{{ minion_skill.id }},{{ minion_skill.identificador }}">
+                                            {% endif %}
+                                        {% endif %}
+                                    </label>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}  
+                            </div>
+                        <table>
+                            <tr>
+                                <td><input type="submit" name="minion_action" value="Go!"><input type="hidden" name="infeliz" value="{{minion.id}}"></td>
+                            </tr>
+                        </table>
+                        </form>
+                    </div>
+                    <br>
+                </div>
+            {% endfor %}
+            <br>
+            <div class="invent">
+                <h2>BAG</h2>
+                <div class="log_box">
+                    <table>
+                    {% for item in invent %}
+                        <tr>
+                            <td style="color:black; border: 3px outset;">{{ item.qtd }}</td><td style="color:black; border: 3px outset;">{{ item.nome }}</td> 
+                        </tr>
+                    {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <br>
+    </center>
+    </body>
+</html>
