@@ -16,8 +16,9 @@ class char(models.Model):
     hp = models.IntegerField() 
     estamina = models.IntegerField()
     base_hp =  models.IntegerField() 
-    base_estamina = models.IntegerField() 
-    dmin = models.IntegerField(blank = True)
+    base_estamina = models.IntegerField()
+    dmin = models.IntegerField(blank=True, null=True)
+    dcrit = models.IntegerField(blank=True, null=True)
 
     class Meta:
         db_table = "perfil"

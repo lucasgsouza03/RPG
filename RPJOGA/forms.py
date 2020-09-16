@@ -51,14 +51,9 @@ class acoes(forms.Form):
                 estamina = estamina + 30
             return estamina
 
-    def turno(estamina, forc_vont):
-        forc_vont = int(forc_vont)
-        if forc_vont == 6:
-            estamina = estamina + 30
-            return estamina
-        else:
-            estamina = estamina + 15
-            return estamina
+    def turno(estamina, forc_vont):    
+        estamina = estamina + 30
+        return estamina
 
 class malun_est(forms.Form):
     nome = forms.CharField()
@@ -81,3 +76,6 @@ class malun_est(forms.Form):
         forc_vont = int(forc_vont)
         estamina = base + ((forc_vont + 10)**2)
         return estamina
+    
+    def calc_crit(self):
+        return 20 - (self.agilidade // 2)

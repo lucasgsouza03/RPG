@@ -17,6 +17,8 @@
                     <b style="color:blue">{{ i.tipo }}:  {{ i.mensagem }}</b><br>
                     {% elif i.mensagem == "Fim da batalha====================================================================================" %}
                     <b style="color:Red">{{ i.tipo }}:  {{ i.mensagem }}</b><br>
+                    {% elif i.mensagem == "Início da batalha===================================================================================" %}
+                    <b style="color:green">{{ i.tipo }}:  {{ i.mensagem }}</b><br>
                     {% else %}
                     {{ i.tipo }}:  {{ i.mensagem }}<br>
                     {% endif %}

@@ -11,7 +11,7 @@ def perfil(request):
     if request.POST:
         form = acoes(request.POST)
         nome = request.POST.get("char")
-        minion = request.POST.get("minion")
+        minionator = request.POST.get("minion")
         Esquiva = request.POST.get("esquiva")
         Block = request.POST.get("block")
         Action = request.POST.get("action")
@@ -19,12 +19,16 @@ def perfil(request):
         Dano = request.POST.get("dano")
         Cura = request.POST.get("cura")
         turno = request.POST.get("EndTurn")
-        fight = request.POST.get("EndFight")
+        restore = request.POST.get("FullRestore")
         aoe = request.POST.get("aoe")
+        start = request.POST.get("Start")
+        end = request.POST.get("End")
+        cd = request.POST.get("RestoreCD")
+        estamina = request.POST.get("RestoreEstamina")
 
         if nome:
             dude = char.objects.get(nome=nome)
-        elif minion:
+        elif minionator:
             dude = minion_stage.objects.get(id=minion)
             Block = ""
             Esquiva = ""
@@ -62,85 +66,79 @@ def perfil(request):
                         i.hp = i.base_hp
                     i.save()
         elif turno:
-            rodadas = rodada.objects.get(id=1)
-            turn = rodadas.turn + 1
-            if turn < 2:
-                rodada.objects.filter(id=1).update(turn=turn)
-            elif turn == 2:
-                rodada.objects.filter(id=1).update(turn=0)
-                skills = skill.objects.all()
-                minion_skills = minion_skill.objects.all()
-                debuff = debuf.objects.filter(id=1)
-                for i in debuff:
-                    if i.duracao > 0:
-                        i.duracao = i.duracao - 1
+            skills = skill.objects.all()
+            minion_skills = minion_skill.objects.all()
+            debuff = debuf.objects.filter(id=1)
+            for i in debuff:
+                if i.duracao > 0:
+                    i.duracao = i.duracao - 1
+                    i.save()
+            for i in skills:
+                if i.duracao_corrent == 20:
+                    m = minion_stage.objects.filter(skill_id=i.id)
+                    vali = None
+                    for j in m:
+                        if j.nome != None:
+                            vali = "minion"
+                    if vali == None:
+                        i.duracao_corrent = 0
+                        i.cd_corrent = i.cd
                         i.save()
-                for i in skills:
-                    if i.duracao_corrent == 20:
-                        m = minion_stage.objects.filter(skill_id=i.id)
-                        vali = None
-                        for j in m:
-                            if j.nome != None:
-                                vali = "minion"
-                        if vali == None:
-                            i.duracao_corrent = 0
+                elif i.duracao > 0 or i.duracao < 20:
+                    if i.fist_turn == 0:
+                        if i.duracao_corrent > 1:
+                            current_duracao = i.duracao_corrent - 1
+                            i.duracao_corrent = current_duracao
+                            i.save()
+                        elif i.duracao_corrent == 1:
+                            current_duracao = i.duracao_corrent - 1
+                            i.duracao_corrent = current_duracao
                             i.cd_corrent = i.cd
                             i.save()
-                    elif i.duracao > 0 or i.duracao < 20:
-                        if i.fist_turn == 0:
-                            if i.duracao_corrent > 1:
-                                current_duracao = i.duracao_corrent - 1
-                                i.duracao_corrent = current_duracao
-                                i.save()
-                            elif i.duracao_corrent == 1:
-                                current_duracao = i.duracao_corrent - 1
-                                i.duracao_corrent = current_duracao
-                                i.cd_corrent = i.cd
-                                i.save()
-                            elif i.duracao_corrent == 0 and i.cd_corrent > 0:
-                                current_cd = i.cd_corrent - 1
-                                i.cd_corrent = current_cd
-                                i.save()
-                        elif i.fist_turn == 1:
-                            i.fist_turn = 0
+                        elif i.duracao_corrent == 0 and i.cd_corrent > 0:
+                            current_cd = i.cd_corrent - 1
+                            i.cd_corrent = current_cd
                             i.save()
+                    elif i.fist_turn == 1:
+                        i.fist_turn = 0
+                        i.save()
 
-                    elif i.cd_corrent > 0:  
-                        if i.fist_turn == 0:  
+                elif i.cd_corrent > 0:  
+                    if i.fist_turn == 0:  
+                        current_cd = i.cd_corrent - 1
+                        i.cd_corrent = current_cd
+                        i.save()
+                    elif i.fist_turn == 1:
+                        i.fist_turn = 0
+                        i.save()
+                        
+            for i in minion_skills:
+                if i.duracao > 0:
+                    if i.fist_turn == 0:
+                        if i.duracao_corrent > 1:
+                            current_duracao = i.duracao_corrent - 1
+                            i.duracao_corrent = current_duracao
+                            i.save()
+                        elif i.duracao_corrent == 1:
+                            current_duracao = i.duracao_corrent - 1
+                            i.duracao_corrent = current_duracao
+                            i.cd_corrent = i.cd
+                            i.save()
+                        elif i.duracao_corrent == 0 and i.cd_corrent > 0:
                             current_cd = i.cd_corrent - 1
                             i.cd_corrent = current_cd
                             i.save()
-                        elif i.fist_turn == 1:
-                            i.fist_turn = 0
-                            i.save()
-                            
-                for i in minion_skills:
-                    if i.duracao > 0:
-                        if i.fist_turn == 0:
-                            if i.duracao_corrent > 1:
-                                current_duracao = i.duracao_corrent - 1
-                                i.duracao_corrent = current_duracao
-                                i.save()
-                            elif i.duracao_corrent == 1:
-                                current_duracao = i.duracao_corrent - 1
-                                i.duracao_corrent = current_duracao
-                                i.cd_corrent = i.cd
-                                i.save()
-                            elif i.duracao_corrent == 0 and i.cd_corrent > 0:
-                                current_cd = i.cd_corrent - 1
-                                i.cd_corrent = current_cd
-                                i.save()
-                        elif i.fist_turn == 1:
-                            i.fist_turn = 0
-                            i.save()
-                    elif i.cd_corrent > 0:  
-                        if i.fist_turn == 0:  
-                            current_cd = i.cd_corrent - 1
-                            i.cd_corrent = current_cd
-                            i.save()
-                        elif i.fist_turn == 1:
-                            i.fist_turn = 0
-                            i.save()                            
+                    elif i.fist_turn == 1:
+                        i.fist_turn = 0
+                        i.save()
+                elif i.cd_corrent > 0:  
+                    if i.fist_turn == 0:  
+                        current_cd = i.cd_corrent - 1
+                        i.cd_corrent = current_cd
+                        i.save()
+                    elif i.fist_turn == 1:
+                        i.fist_turn = 0
+                        i.save()                            
             for i in dude:
                 estamina = acoes.turno(i.estamina, i.forc_vont)
                 if estamina > i.base_estamina:
@@ -149,7 +147,7 @@ def perfil(request):
                 i.save()
             msg = "Fim de turno--------------------------------------------------------------------------------------------------------------------------"
             log.objects.create(tipo="ACTION", mensagem=msg)
-        elif fight:
+        elif restore:
             skills = skill.objects.all()
             minions = minion_stage.objects.all().delete()
             minion_skills = minion_skill.objects.all()
@@ -158,6 +156,7 @@ def perfil(request):
                 i.duracao = 0
                 i.save()
             for i in dude:
+                i.hp = i.base_hp
                 i.estamina = i.base_estamina
                 i.save()
             for i in skills:
@@ -172,6 +171,31 @@ def perfil(request):
                 i.fist_turn = 0
                 i.max_use_corrent = i.max_use
                 i.save()
+        elif cd:
+            skills = skill.objects.filter(char_id=dude.id)
+            mini = minion.objects.get(char_id=dude.id)
+            minion_skills = minion_skill.objects.filter(minion_id=mini.id)
+            for i in skills:
+                i.cd_corrent = 0
+                i.duracao_corrent = 0
+                i.fist_turn = 0
+                i.max_use_corrent = i.max_use
+                i.save()
+            for i in minion_skills:
+                i.cd_corrent = 0
+                i.duracao_corrent = 0
+                i.fist_turn = 0
+                i.max_use_corrent = i.max_use
+                i.save()
+        elif estamina != "0":
+            dude.estamina = dude.estamina + int(estamina)
+            if dude.estamina > dude.base_estamina:
+                dude.estamina = dude.base_estamina
+            dude.save()
+        elif start:
+            msg = "Início da batalha==================================================================================="
+            log.objects.create(tipo="BLOCK", mensagem=msg)
+        elif end:
             msg = "Fim da batalha===================================================================================="
             log.objects.create(tipo="BLOCK", mensagem=msg)
         elif Block != "":
@@ -205,7 +229,7 @@ def perfil(request):
                 msg = str(dude.nome)+" falha ao efetuar a esquiva e toma "+str(Dano)+" de dano"
                 log.objects.create(tipo="ESQUIVA", mensagem=msg)
         elif Dano != "0":
-            if minion:
+            if minionator:
                 dude.hp = dude.hp - int(Dano)
                 dude.save()
                 if dude.hp <= 0:
@@ -303,8 +327,10 @@ def create_char(request):
         dmin = request.POST.get("dmin")
         hp = form.calc_hp(forca, forc_vont)
         estamina = form.calc_estamina(forc_vont)
+        dcrit = form.calc_crit(dmin)
+
         if (int(forca)+int(habilidade)+int(agilidade)+int(dex)+int(inteligencia)+int(forc_vont)) == 17:
-            dude = char.objects.create(nome=nome, identificador=identificador, forca=forca, habilidade=habilidade, agilidade=agilidade, dex=dex, inteligencia=inteligencia, forc_vont=forc_vont, hp=hp, estamina=estamina, base_hp=hp, base_estamina=estamina, dmin=dmin)
+            dude = char.objects.create(nome=nome, identificador=identificador, forca=forca, habilidade=habilidade, agilidade=agilidade, dex=dex, inteligencia=inteligencia, forc_vont=forc_vont, hp=hp, estamina=estamina, base_hp=hp, base_estamina=estamina, dmin=dmin, dcrit=dcrit)
             dude.save()
         
     else:
@@ -442,12 +468,12 @@ def detalhes(request, identificador):
                     perso.save()
                 if habili.nome == "Maldição Sombria":
                     debuf.objects.filter(id=1).update(duracao=2)
-                else:
-                    if habili.bonus_cost != 0 and perso.nome == 'Mandrake Satawin':
-                        perso.hp = perso.hp - habili.bonus_cost
-                        perso.save()
-                    perso.estamina = perso.estamina - habili.estamina
+                
+                elif habili.bonus_cost != 0 and perso.nome == 'Mandrake Satawin':
+                    perso.hp = perso.hp - habili.bonus_cost
                     perso.save()
+                perso.estamina = perso.estamina - habili.estamina
+                perso.save()
                 if reduc:
                     dmin = perso.dmin - int(reduc)
                 else:
@@ -464,21 +490,9 @@ def detalhes(request, identificador):
                         for por in porra:
                             por.cd_corrent = habili.cd
                             por.fist_turn = 1
-                            por.save()
-                    if habili.nome == "Investida Cortante":
-                        if result >= 9 and result <= 12:
-                            habili.dano = 65
-                        elif result >= 13 and result <= 15:
-                            habili.dano = 130
-                        elif result >= 16 and result <= 19:
-                            habili.dano = 260
-                        elif result == 20:
-                            habili.dano = 520
-                    elif habili.nome == "Paralisia do Olhar":
-                        if result >= 14:
-                            habili.dano = habili.dano * 2                    
-                    elif result == 20:
-                        habili.dano = habili.dano * 2                    
+                            por.save() 
+                    if result >= perso.dcrit:
+                        habili.dano = habili.dano * 2                                   
                     if habili.dano < 0:
                         if habili.nome == "Cura Elfica":
                             party = char.objects.all()
@@ -515,7 +529,7 @@ def detalhes(request, identificador):
                             debuf.objects.filter(id=int(debuff)).update(duracao=0)
                         msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(habili.dano)+")"
                         
-                    log.objects.create(tipo="SKILL", mensagem=msg)          
+                    log.objects.create(tipo="SKILL", mensagem=msg)
                 elif result < dmin:
                     if habili.max_use != 0:
                         habili.max_use_corrent = habili.max_use_corrent - 1

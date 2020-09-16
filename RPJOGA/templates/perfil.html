@@ -10,15 +10,26 @@
 	<body>
         <form method="POST" action="">
             {% csrf_token %}
-            <input type="submit" name="EndFight" value="End">
+            <input type="submit" name="FullRestore" value="Full Restore">
         </form>
+        <br>
+        <div style="display: inline;">
+            <form method="POST" action="" style="display: inline;">
+                {% csrf_token %}
+                <input type="submit" name="Start" value="Start Fight" >
+            </form>
+            <form method="POST" action="" style="display: inline;">
+                {% csrf_token %}
+                <input type="submit" name="End" value="End Fight">
+            </form>
+        </div>
         <center>
         <div>
             <form method="POST" action="">
                 {% csrf_token %}
                 <h1>DANO AOE</h1>
                 <input class="input" type="number" name="aoe">
-                <input type="submit" name="EndFight" value="End">
+                <input type="submit" name="FullRestore" value="Go">
             </form>
         </div>
         </center>
@@ -72,7 +83,13 @@
                             <td></td><td>Cura:</td><td> <input type="number" name="cura" class="input" value="0"/> </td>
                         </tr>
                         <tr>
+                            <td></td><td>Restore Estamina:</td><td> <input type="number" name="RestoreEstamina" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
                             <td></td><td>Dano:</td><td> <input type="number" name="dano" class="input" value="0"/> </td>
+                        </tr>
+                        <tr>
+                            <td></td><td>Restore CD:</td><td> <input type="checkbox" name="RestoreCD" class="input" value="True"/> </td>
                         </tr>
                         <tr>
                             <td></td><td></td><td> <button name="char" type="submit" value="{{ perfil.nome }}">Go</button> </td>
