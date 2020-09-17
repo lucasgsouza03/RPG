@@ -41,7 +41,7 @@
                             <td></td><td>Força de Vontade:</td><td class="num"> {{ perfil.forc_vont }} </td>
                         </tr>
                         <tr>
-                            <td></td><td>Dado Minimo:</td><td class="num"> {{ perfil.dmin }} </td>
+                            <td></td><td>Dado Minimo:</td><td class="num"> {{ perfil.dmin|subtracao:perfil.reduc }} </td>
                         </tr>
                     </table>
                 </div>

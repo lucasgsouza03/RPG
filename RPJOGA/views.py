@@ -25,9 +25,12 @@ def perfil(request):
         end = request.POST.get("End")
         cd = request.POST.get("RestoreCD")
         estamina = request.POST.get("RestoreEstamina")
+        reduc = request.POST.get("reduc") 
 
         if nome:
             dude = char.objects.get(nome=nome)
+            dude.reduc = reduc
+            dude.save()
         elif minionator:
             dude = minion_stage.objects.get(id=minion)
             Block = ""
@@ -187,7 +190,7 @@ def perfil(request):
                 i.fist_turn = 0
                 i.max_use_corrent = i.max_use
                 i.save()
-        elif estamina != "0":
+        elif estamina != "0" and estamina != None:
             dude.estamina = dude.estamina + int(estamina)
             if dude.estamina > dude.base_estamina:
                 dude.estamina = dude.base_estamina
@@ -474,10 +477,11 @@ def detalhes(request, identificador):
                     perso.save()
                 perso.estamina = perso.estamina - habili.estamina
                 perso.save()
+                dmin = perso.dmin - perso.reduc
                 if reduc:
-                    dmin = perso.dmin - int(reduc)
+                    dmin = dmin - int(reduc)
                 else:
-                    dmin = perso.dmin - habili.reduc
+                    dmin = dmin - habili.reduc
                 if result >= dmin:
                     if habili.max_use != 0:
                         habili.max_use_corrent = habili.max_use_corrent - 1

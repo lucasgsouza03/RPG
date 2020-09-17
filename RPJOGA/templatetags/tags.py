@@ -6,3 +6,7 @@ register = template.Library()
 def positivo(text):
     text = abs(int(text))
     return str(text)
+
+@register.filter(name='subtracao')
+def subtracao(valor, argumento):
+    return valor - argumento

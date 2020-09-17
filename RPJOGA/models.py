@@ -19,6 +19,7 @@ class char(models.Model):
     base_estamina = models.IntegerField()
     dmin = models.IntegerField(blank=True, null=True)
     dcrit = models.IntegerField(blank=True, null=True)
+    reduc = models.IntegerField(default=0)
 
     class Meta:
         db_table = "perfil"
@@ -73,13 +74,13 @@ class skill(models.Model):
     max_use = models.IntegerField()
     max_use_corrent = models.IntegerField(default = 0)
     fist_turn = models.IntegerField(default = 0)
-    reduc = models.IntegerField()
     dano = models.IntegerField(blank = True)
     bonus_dano = models.IntegerField(null=True, blank = True)
     bonus_cost = models.IntegerField(null=True, blank = True)
     estamina = models.IntegerField(blank = True)
     char = models.ForeignKey('char', on_delete=models.DO_NOTHING,)
     tipo = models.CharField(max_length=50, blank=True)
+    reduc = models.IntegerField(default=0)   
 
     class Meta:
         db_table = "skill"
@@ -90,10 +91,10 @@ class enemy_skill(models.Model):
     cd_corrent = models.IntegerField(default = 0)
     duracao = models.IntegerField()
     duracao_corrent = models.IntegerField(default = 0) 
-    reduc = models.IntegerField()
     dano = models.IntegerField(blank = True)  
     enemy = models.ForeignKey('enemy', on_delete=models.DO_NOTHING,)
     tipo = models.CharField(max_length=50, blank=True)
+    reduc = models.IntegerField(default=0)
 
     class Meta:
         db_table = "enemy_skill"
@@ -121,13 +122,13 @@ class minion_skill(models.Model):
     cd_corrent = models.IntegerField(default = 0)
     duracao = models.IntegerField()
     duracao_corrent = models.IntegerField(default = 0) 
-    reduc = models.IntegerField()
     dano = models.IntegerField(blank = True)  
     minion = models.ForeignKey('minion', on_delete=models.DO_NOTHING,)
     tipo = models.CharField(max_length=50, blank=True)
     max_use = models.IntegerField(default = 0)
     max_use_corrent = models.IntegerField(default = 0)
     fist_turn = models.IntegerField(default = 0)
+    reduc = models.IntegerField(default=0)
 
     class Meta:
         db_table = "minion_skill"
