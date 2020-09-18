@@ -25,11 +25,14 @@ def perfil(request):
         end = request.POST.get("End")
         cd = request.POST.get("RestoreCD")
         estamina = request.POST.get("RestoreEstamina")
+        reduc = request.POST.get("reduc") 
 
         if nome:
             dude = char.objects.get(nome=nome)
+            dude.reduc = reduc
+            dude.save()
         elif minionator:
-            dude = minion_stage.objects.get(id=minion)
+            dude = minion_stage.objects.get(id=minionator)
             Block = ""
             Esquiva = ""
         else:
@@ -93,15 +96,19 @@ def perfil(request):
                         elif i.duracao_corrent == 1:
                             current_duracao = i.duracao_corrent - 1
                             i.duracao_corrent = current_duracao
+                            if i.tipo == "summon":
+                                minion_stage.objects.get(skill_id=i.id).delete()
                             i.cd_corrent = i.cd
                             i.save()
                         elif i.duracao_corrent == 0 and i.cd_corrent > 0:
                             current_cd = i.cd_corrent - 1
                             i.cd_corrent = current_cd
                             i.save()
+                        
                     elif i.fist_turn == 1:
                         i.fist_turn = 0
                         i.save()
+                    
 
                 elif i.cd_corrent > 0:  
                     if i.fist_turn == 0:  
@@ -187,7 +194,7 @@ def perfil(request):
                 i.fist_turn = 0
                 i.max_use_corrent = i.max_use
                 i.save()
-        elif estamina != "0":
+        elif estamina != "0" and estamina != None:
             dude.estamina = dude.estamina + int(estamina)
             if dude.estamina > dude.base_estamina:
                 dude.estamina = dude.base_estamina
@@ -233,7 +240,12 @@ def perfil(request):
                 dude.hp = dude.hp - int(Dano)
                 dude.save()
                 if dude.hp <= 0:
-                    minion_stage.objects.get(id=dude.id).delete()
+                    info = minion_stage.objects.get(id=dude.id)
+                    m_skill = skill.objects.get(id=info.skill_id)
+                    m_skill.duracao_corrent = 0
+                    m_skill.cd_corrent = m_skill.cd
+                    m_skill.save()
+                    info.delete()
                     msg = str(dude.nome)+" morre ao receber "+str(Dano)+" de dano"
                     log.objects.create(tipo="DAMAGE", mensagem=msg)
                 else:
@@ -388,7 +400,7 @@ def create_minions(request):
         hp = request.POST.get("hp")
         person = request.POST.get("char")
         habili = request.POST.get("skill")
-        dude = minion.objects.create(nome=nome, hp=hp, hp_base=hp, char_id=person, skill_id=habili)
+        dude = minion.objects.create(nome=nome, hp=hp, base_hp=hp, char_id=person, skill_id=habili)
         dude.save()
     contexto = {
         "chars":char.objects.all(),
@@ -415,6 +427,7 @@ def detalhes(request, identificador):
         ativa = request.POST.get("ativa")
         bonus = request.POST.get("bonus")
         debuff = request.POST.get("debuf")
+        quickskill = request.POST.get("quickskill")
         hab = ""
         if pala != None:
             palas = pala.split(",")
@@ -460,9 +473,6 @@ def detalhes(request, identificador):
                         por.fist_turn = 1
                         por.save()
             elif habili.estamina <= perso.estamina:
-                if habili.tipo == "summon":
-                    load_minion = minion.objects.get(skill_id__id=habili.id)
-                    minion_stage.objects.create(nome=load_minion.nome, hp=load_minion.hp, base_hp=load_minion.base_hp, char=perso.id, minion_id=load_minion.id, skill_id=load_minion.skill_id)
                 if habili.nome == "Pika das Galaxias":
                     perso.estamina = 0
                     perso.save()
@@ -474,17 +484,21 @@ def detalhes(request, identificador):
                     perso.save()
                 perso.estamina = perso.estamina - habili.estamina
                 perso.save()
+                dmin = perso.dmin - perso.reduc
                 if reduc:
-                    dmin = perso.dmin - int(reduc)
+                    dmin = dmin - int(reduc)
                 else:
-                    dmin = perso.dmin - habili.reduc
+                    dmin = dmin - habili.reduc
                 if result >= dmin:
+                    if habili.tipo == "summon":
+                        load_minion = minion.objects.get(skill_id__id=habili.id)
+                        minion_stage.objects.create(nome=load_minion.nome, hp=load_minion.hp, base_hp=load_minion.base_hp, char=perso.id, minion_id=load_minion.id, skill_id=load_minion.skill_id)
                     if habili.max_use != 0:
                         habili.max_use_corrent = habili.max_use_corrent - 1
                         habili.save()
                     if habili.duracao:
                         if habili.duracao_corrent == 0 and habili.cd_corrent == 0:
-                            skill.objects.filter(id=int(hab)).update(cd_corrent=habili.duracao,duracao_corrent=habili.duracao,fist_turn=1)
+                            skill.objects.filter(id=int(hab)).update(cd_corrent=habili.duracao,duracao_corrent=habili.duracao,fist_turn=1)                        
                     else:
                         porra = skill.objects.filter(identificador=identify)
                         for por in porra:
