@@ -77,5 +77,5 @@ class malun_est(forms.Form):
         estamina = base + ((forc_vont + 10)**2)
         return estamina
     
-    def calc_crit(self):
-        return 20 - (self.agilidade // 2)
+    def calc_crit(self, agilidade):
+        return 20 - (agilidade // 2)

@@ -339,7 +339,7 @@ def create_char(request):
         dmin = request.POST.get("dmin")
         hp = form.calc_hp(forca, forc_vont)
         estamina = form.calc_estamina(forc_vont)
-        dcrit = form.calc_crit()
+        dcrit = form.calc_crit(int(agilidade))
 
         if (int(forca)+int(habilidade)+int(agilidade)+int(dex)+int(inteligencia)+int(forc_vont)) == 17:
             dude = char.objects.create(nome=nome, identificador=identificador, forca=forca, habilidade=habilidade, agilidade=agilidade, dex=dex, inteligencia=inteligencia, forc_vont=forc_vont, hp=hp, estamina=estamina, base_hp=hp, base_estamina=estamina, dmin=dmin, dcrit=dcrit)
@@ -479,7 +479,7 @@ def detalhes(request, identificador):
                 if habili.nome == "Maldição Sombria":
                     debuf.objects.filter(id=1).update(duracao=2)
                 
-                elif habili.bonus_cost != 0 and perso.nome == 'Mandrake Satawin':
+                elif habili.bonus_cost != 0:
                     perso.hp = perso.hp - habili.bonus_cost
                     perso.save()
                 perso.estamina = perso.estamina - habili.estamina
