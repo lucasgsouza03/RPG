@@ -25,7 +25,7 @@ def perfil(request):
         end = request.POST.get("End")
         cd = request.POST.get("RestoreCD")
         estamina = request.POST.get("RestoreEstamina")
-        reduc = request.POST.get("reduc") 
+        reduc = request.POST.get("reduc")
 
         if nome:
             dude = char.objects.get(nome=nome)
@@ -369,8 +369,10 @@ def create_skill(request):
         tipo = request.POST.get("tipo")
         max_use = request.POST.get("max_use")
         estamina = request.POST.get("estamina")
+        item_cost = request.POST.get("item_cost")
+        item_cost_name = request.POST.get("item_cost_name")
         if aliado:
-            skill.objects.create(nome=nome, identificador=identificador, cd=cd, duracao=duracao, reduc=reduc, dano=dano, char_id=aliado, tipo=tipo, max_use=max_use, max_use_corrent=max_use, estamina=estamina, bonus_dano=dano_bonus, bonus_cost=cost_bonus)
+            skill.objects.create(nome=nome, identificador=identificador, cd=cd, duracao=duracao, reduc=reduc, dano=dano, char_id=aliado, tipo=tipo, max_use=max_use, max_use_corrent=max_use, estamina=estamina, bonus_dano=dano_bonus, bonus_cost=cost_bonus, item_cost=item_cost, item_cost_name=item_cost_name)
         elif inimigo:
             enemy_skill.objects.create(nome=nome, cd=cd, duracao=duracao, reduc=reduc, dano=dano, enemy_id=inimigo)
         elif minions:
@@ -489,6 +491,12 @@ def detalhes(request, identificador):
                     dmin = dmin - int(reduc)
                 else:
                     dmin = dmin - habili.reduc
+                if habili.item_cost > 0:
+                    items = invent.objects.filter(char_id=habili.char_id)
+                    for item in items:
+                        if item.nome == habili.item_cost_name:
+                            item.qtd = item.qtd - habili.item_cost
+                            item.save()
                 if result >= dmin:
                     if habili.tipo == "summon":
                         load_minion = minion.objects.get(skill_id__id=habili.id)
