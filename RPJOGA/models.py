@@ -80,7 +80,7 @@ class skill(models.Model):
     estamina = models.IntegerField(blank = True)
     char = models.ForeignKey('char', on_delete=models.DO_NOTHING,)
     tipo = models.CharField(max_length=50, blank=True)
-    reduc = models.IntegerField(default=0)   
+    reduc = models.IntegerField(default=0)
 
     class Meta:
         db_table = "skill"
