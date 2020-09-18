@@ -1,3 +1,4 @@
+from os import truncate
 from django.db import models
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -82,6 +83,8 @@ class skill(models.Model):
     char = models.ForeignKey('char', on_delete=models.DO_NOTHING,)
     tipo = models.CharField(max_length=50, blank=True)
     reduc = models.IntegerField(default=0)
+    item_cost = models.IntegerField(default=0)
+    item_cost_name = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         db_table = "skill"
