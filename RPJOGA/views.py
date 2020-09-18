@@ -327,7 +327,7 @@ def create_char(request):
         dmin = request.POST.get("dmin")
         hp = form.calc_hp(forca, forc_vont)
         estamina = form.calc_estamina(forc_vont)
-        dcrit = form.calc_crit(dmin)
+        dcrit = form.calc_crit()
 
         if (int(forca)+int(habilidade)+int(agilidade)+int(dex)+int(inteligencia)+int(forc_vont)) == 17:
             dude = char.objects.create(nome=nome, identificador=identificador, forca=forca, habilidade=habilidade, agilidade=agilidade, dex=dex, inteligencia=inteligencia, forc_vont=forc_vont, hp=hp, estamina=estamina, base_hp=hp, base_estamina=estamina, dmin=dmin, dcrit=dcrit)
@@ -490,7 +490,7 @@ def detalhes(request, identificador):
                         for por in porra:
                             por.cd_corrent = habili.cd
                             por.fist_turn = 1
-                            por.save() 
+                            por.save()
                     if result >= perso.dcrit:
                         habili.dano = habili.dano * 2                                   
                     if habili.dano < 0:
@@ -581,6 +581,7 @@ def logs(request):
 def invent_manage(request):
     nome = request.POST.get("nome")
     qtd = request.POST.get("qtd")
+    limit = request.POST.get("limit")
     nome = request.POST.get("nome")
     update = request.POST.get("update")
     delete = request.POST.get("delete")
@@ -588,12 +589,18 @@ def invent_manage(request):
 
     if request.POST:
         if update:
-            invent.objects.filter(id=update).update(qtd=qtd)
+            item = invent.objects.get(id=update)
+            if item.limit_qtd == 0:
+                qtd = qtd
+            elif int(qtd) > item.limit_qtd:
+                qtd = item.limit_qtd
+            item.qtd = qtd
+            item.save()
         elif delete:
             invent.objects.filter(id=delete).delete()
         elif new and nome and qtd:
             dude = char.objects.get(nome=new)
-            invent.objects.create(qtd=qtd, nome=nome, char_id=dude.id)
+            invent.objects.create(qtd=qtd, limit_qtd=limit, nome=nome, char_id=dude.id)
         contexto = {
             "chars": char.objects.all(),
             "items": invent.objects.all(),

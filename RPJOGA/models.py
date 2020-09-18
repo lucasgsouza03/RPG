@@ -36,6 +36,7 @@ class log(models.Model):
 
 class invent(models.Model):
     qtd = models.IntegerField()
+    limit_qtd = models.IntegerField(default=0)
     nome = models.CharField(max_length=150)
     char = models.ForeignKey('char',
     on_delete=models.DO_NOTHING,)

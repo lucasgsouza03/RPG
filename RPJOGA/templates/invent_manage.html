@@ -21,7 +21,7 @@
                         <form method="POST" action="">
                             {% csrf_token %}
                             <tr>
-                                <td style="color: black;">QTD:</td><td style="color: black;"><input type="number" value="{{ item.qtd }}" name="qtd"></td><td style="color: black;">item:</td><td style="color: black;">{{ item.nome }}</td><td style="color: black;"><button name="update" type="submit" value="{{ item.id }}">update</button></td><td style="color: black;"><button name="delete" type="submit" value="{{ item.id }}">Delete</button></td>
+                                <td style="color: black;">QTD:</td><td style="color: black;"><input type="number" value="{{ item.qtd }}" name="qtd"></td><td style="color: black;">| Limit:</td><td style="color: black;">{% if item.limit_qtd == 0 %}∞{% else %}{{ item.limit_qtd }}{% endif %}</td><td style="color: black;">| Item:</td><td style="color: black;">{{ item.nome }}</td><td style="color: black;"><button name="update" type="submit" value="{{ item.id }}">update</button></td><td style="color: black;"><button name="delete" type="submit" value="{{ item.id }}">Delete</button></td>
                             </tr>
                         </form>
                         {% endif %}
@@ -32,7 +32,7 @@
                     <form method="POST" action="">
                         {% csrf_token %}
                         <tr>
-                            <td style="color: black;">QTD:</td><td style="color: black;"><input type="number" name="qtd"></td><td style="color: black;">item:</td><td style="color: black;"><input type="text" name="nome"></td><td style="color: black;"><button name="new" type="submit" value="{{ char.nome }}">New</button></td>
+                            <td style="color: black;">QTD:</td><td style="color: black;"><input type="number" name="qtd" value="0"></td><td style="color: black;">Limite:</td><td style="color: black;"><input type="number" name="limit" value="0"></td><td style="color: black;">item:</td><td style="color: black;"><input type="text" name="nome"></td><td style="color: black;"><button name="new" type="submit" value="{{ char.nome }}">New</button></td>
                         </tr>
                     </form>
                     </table>
