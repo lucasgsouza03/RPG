@@ -121,19 +121,21 @@
                             </div>
                         {% endif %}
                         {% endfor %}
-                    <div class="skill"> 
+
                         {% for skill in skills %}
                             {% if skill.tipo == "quickskill" %}
+                        <div class="skill"> 
                             <label>
-                                <b style="color:rgb(92, 81, 81)">{{skill.nome}}</b>
+                            <b style="color:rgb(92, 81, 81)">{{skill.nome}}</b>
                             <br>
-                            <b style="color:rgba(141, 171, 192, 0.61);">quickskill</b>
+                            <b style="color:rgba(62, 156, 223, 0.863);">quickskill</b>
                             <br>
                             <input type="radio" name="skill" value="{{ skill.id }},{{ skill.identificador }}">
                             </label>
+                        </div>
                             {% endif %}
                         {% endfor %}
-                    </div>
+
                     <div class="skills_reduc">
                         <p style="color:white; font-weight:bold;">ATIVA: </p>
                         {% for skill in skills %}
