@@ -526,13 +526,42 @@ def detalhes(request, identificador):
                                 item.save()
                 if result >= dmin:
                     if habili.tipo == "summon":
-                        load_minion = minion.objects.get(skill_id__id=habili.id)
+                        load_minion = minion.get.objects(skill_id_=habili.id)
                         minion_stage.objects.create(nome=load_minion.nome, hp=load_minion.hp, base_hp=load_minion.base_hp, char=perso.id, minion_id=load_minion.id, skill_id=load_minion.skill_id)
                     elif habili.tipo == "transform":
                         perso.max_hp = perso.max_hp + habili.bonus_hp
                         perso.hp = perso.hp + habili.bonus_hp
                         perso.reduc = perso.reduc + habili.reduc
                         perso.save()
+                    if habili.tipo == "quickskill":
+                        mat_prim = invent.objects.get(nome="Matéria Prima")
+                        muni = invent.objects.get(nome="Munição")       
+                        muni_espec = invent.objects.get(nome="Munição especial")                 
+                        if habili.nome == "Engenheiro especialista":
+                            armazem = invent.objects.get(nome="Armazem")                            
+                            dispo = invent.objects.get(nome="Dispositivos")                            
+                            dispo.qtd += 20
+                            if dispo.qtd > dispo.limit_qtd:
+                                sobra = dispo.qtd - dispo.limit_qtd
+                                dispo.qtd = dispo.limit_qtd
+                                armazem.qtd += sobra
+                                armazem.save()
+                            dispo.save()
+                        elif habili.nome == "Proficiência em Alquimia":
+                            if result <= 14:
+                                mat_prim.qtd += 5
+                            elif result >= 15 and result <= 19:
+                                mat_prim.qtd += 10
+                            else:
+                                mat_prim.qtd += 15
+                            mat_prim.save()
+                        elif habili.nome == "Craft":
+                            mat_prim.qtd -= 1
+                            muni_espec.qtd += 1
+                            muni.qtd += 5
+                            mat_prim.save()
+                            muni_espec.save()
+                            muni.save()
                     if habili.max_use != 0:
                         habili.max_use_corrent = habili.max_use_corrent - 1
                         habili.save()
