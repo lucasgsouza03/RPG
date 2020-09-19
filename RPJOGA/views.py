@@ -491,7 +491,7 @@ def detalhes(request, identificador):
                     dmin = dmin - habili.reduc
                 if result >= dmin:
                     if habili.tipo == "summon":
-                        load_minion = minion.objects.get(skill_id__id=habili.id)
+                        load_minion = minion.get.objects(skill_id_=habili.id)
                         minion_stage.objects.create(nome=load_minion.nome, hp=load_minion.hp, base_hp=load_minion.base_hp, char=perso.id, minion_id=load_minion.id, skill_id=load_minion.skill_id)
                     if habili.max_use != 0:
                         habili.max_use_corrent = habili.max_use_corrent - 1
