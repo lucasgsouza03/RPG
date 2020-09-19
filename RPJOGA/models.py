@@ -16,7 +16,8 @@ class char(models.Model):
     forc_vont = models.IntegerField()
     hp = models.IntegerField() 
     estamina = models.IntegerField()
-    base_hp =  models.IntegerField() 
+    base_hp = models.IntegerField()
+    max_hp = models.IntegerField(default=0)
     base_estamina = models.IntegerField()
     dmin = models.IntegerField(blank=True, null=True)
     dcrit = models.IntegerField(blank=True, null=True)
@@ -85,6 +86,7 @@ class skill(models.Model):
     reduc = models.IntegerField(default=0)
     item_cost = models.IntegerField(default=0)
     item_cost_name = models.CharField(max_length=150, blank=True, null=True)
+    bonus_hp = models.IntegerField(default=0)
 
     class Meta:
         db_table = "skill"

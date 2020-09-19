@@ -57,16 +57,16 @@ def perfil(request):
                 for i in dude:
                     i.hp = i.hp - int(aoe)
                     i.estamina = i.estamina - (int(aoe)/4)
-                    if i.hp > i.base_hp:
-                        i.hp = i.base_hp
+                    if i.hp > i.max_hp:
+                        i.hp = i.max_hp
                     if i.estamina > i.base_estamina:
                         i.estamina = i.base_estamina
                     i.save()
             elif int(aoe) < 0:
                 for i in dude:
                     i.hp = i.hp - int(aoe)
-                    if i.hp > i.base_hp:
-                        i.hp = i.base_hp
+                    if i.hp > i.max_hp:
+                        i.hp = i.max_hp
                     i.save()
         elif turno:
             skills = skill.objects.all()
@@ -98,6 +98,13 @@ def perfil(request):
                             i.duracao_corrent = current_duracao
                             if i.tipo == "summon":
                                 minion_stage.objects.get(skill_id=i.id).delete()
+                            elif i.tipo == "transform":
+                                personagem = char.objects.get(id=i.char_id)
+                                personagem.max_hp = personagem.base_hp
+                                if personagem.hp > personagem.max_hp:
+                                    personagem.hp = personagem.max_hp
+                                personagem.reduc = 0
+                                personagem.save()
                             i.cd_corrent = i.cd
                             i.save()
                         elif i.duracao_corrent == 0 and i.cd_corrent > 0:
@@ -163,7 +170,7 @@ def perfil(request):
                 i.duracao = 0
                 i.save()
             for i in dude:
-                i.hp = i.base_hp
+                i.hp = i.max_hp
                 i.estamina = i.base_estamina
                 i.save()
             for i in skills:
@@ -171,6 +178,13 @@ def perfil(request):
                 i.duracao_corrent = 0
                 i.fist_turn = 0
                 i.max_use_corrent = i.max_use
+                if i.tipo == "transform":
+                    personagem = char.objects.get(id=i.char_id)
+                    personagem.max_hp = personagem.base_hp
+                    if personagem.hp > personagem.max_hp:
+                        personagem.hp = personagem.max_hp
+                    personagem.reduc = 0
+                    personagem.save()
                 i.save()
             for i in minion_skills:
                 i.cd_corrent = 0
@@ -180,20 +194,31 @@ def perfil(request):
                 i.save()
         elif cd:
             skills = skill.objects.filter(char_id=dude.id)
-            mini = minion.objects.get(char_id=dude.id)
-            minion_skills = minion_skill.objects.filter(minion_id=mini.id)
             for i in skills:
                 i.cd_corrent = 0
                 i.duracao_corrent = 0
                 i.fist_turn = 0
                 i.max_use_corrent = i.max_use
+                if i.tipo == "transform":
+                    personagem = char.objects.get(id=i.char_id)
+                    personagem.max_hp = personagem.base_hp
+                    if personagem.hp > personagem.max_hp:
+                        personagem.hp = personagem.max_hp
+                    personagem.reduc = 0
+                    personagem.save()
                 i.save()
-            for i in minion_skills:
-                i.cd_corrent = 0
-                i.duracao_corrent = 0
-                i.fist_turn = 0
-                i.max_use_corrent = i.max_use
-                i.save()
+            try:
+                mini = minion.objects.get(char_id=dude.id)
+                minion_skills = minion_skill.objects.filter(minion_id=mini.id)
+                
+                for i in minion_skills:
+                    i.cd_corrent = 0
+                    i.duracao_corrent = 0
+                    i.fist_turn = 0
+                    i.max_use_corrent = i.max_use
+                    i.save()
+            except:
+                pass
         elif estamina != "0" and estamina != None:
             dude.estamina = dude.estamina + int(estamina)
             if dude.estamina > dude.base_estamina:
@@ -264,8 +289,8 @@ def perfil(request):
                 log.objects.create(tipo="DAMAGE", mensagem=msg)
         elif Cura != "0":
             hp = dude.hp + int(Cura)
-            if hp > dude.base_hp:
-                hp = dude.base_hp
+            if hp > dude.max_hp:
+                hp = dude.max_hp
             dude.hp = hp
             dude.save()
             msg = str(dude.nome)+" recebe uma cura de "+str(Cura)+" de HP"
@@ -342,7 +367,7 @@ def create_char(request):
         dcrit = form.calc_crit(int(agilidade))
 
         if (int(forca)+int(habilidade)+int(agilidade)+int(dex)+int(inteligencia)+int(forc_vont)) == 17:
-            dude = char.objects.create(nome=nome, identificador=identificador, forca=forca, habilidade=habilidade, agilidade=agilidade, dex=dex, inteligencia=inteligencia, forc_vont=forc_vont, hp=hp, estamina=estamina, base_hp=hp, base_estamina=estamina, dmin=dmin, dcrit=dcrit)
+            dude = char.objects.create(nome=nome, identificador=identificador, forca=forca, habilidade=habilidade, agilidade=agilidade, dex=dex, inteligencia=inteligencia, forc_vont=forc_vont, hp=hp, estamina=estamina, base_hp=hp, max_hp=hp, base_estamina=estamina, dmin=dmin, dcrit=dcrit)
             dude.save()
         
     else:
@@ -371,8 +396,9 @@ def create_skill(request):
         estamina = request.POST.get("estamina")
         item_cost = request.POST.get("item_cost")
         item_cost_name = request.POST.get("item_cost_name")
+        bonus_hp = request.POST.get("bonus_hp")
         if aliado:
-            skill.objects.create(nome=nome, identificador=identificador, cd=cd, duracao=duracao, reduc=reduc, dano=dano, char_id=aliado, tipo=tipo, max_use=max_use, max_use_corrent=max_use, estamina=estamina, bonus_dano=dano_bonus, bonus_cost=cost_bonus, item_cost=item_cost, item_cost_name=item_cost_name)
+            skill.objects.create(nome=nome, identificador=identificador, cd=cd, duracao=duracao, reduc=reduc, dano=dano, char_id=aliado, tipo=tipo, max_use=max_use, max_use_corrent=max_use, estamina=estamina, bonus_dano=dano_bonus, bonus_cost=cost_bonus, item_cost=item_cost, item_cost_name=item_cost_name, bonus_hp=bonus_hp)
         elif inimigo:
             enemy_skill.objects.create(nome=nome, cd=cd, duracao=duracao, reduc=reduc, dano=dano, enemy_id=inimigo)
         elif minions:
@@ -475,32 +501,38 @@ def detalhes(request, identificador):
                         por.fist_turn = 1
                         por.save()
             elif habili.estamina <= perso.estamina:
-                if habili.nome == "Pika das Galaxias":
-                    perso.estamina = 0
-                    perso.save()
-                if habili.nome == "Maldição Sombria":
-                    debuf.objects.filter(id=1).update(duracao=2)
-                
+                if habili.nome == "Barreira Redentora":
+                    other_habili = skill.objects.get(nome="Barreira-LD-16")
+                    other_habili.duracao_corrent = 0
+                    other_habili.cd_corrent = 0
+                    other_habili.save()
                 elif habili.bonus_cost != 0:
                     perso.hp = perso.hp - habili.bonus_cost
                     perso.save()
                 perso.estamina = perso.estamina - habili.estamina
                 perso.save()
                 dmin = perso.dmin - perso.reduc
-                if reduc:
-                    dmin = dmin - int(reduc)
-                else:
-                    dmin = dmin - habili.reduc
+                if habili.tipo != "transform":
+                    if reduc:
+                        dmin = dmin - int(reduc)
+                    else:
+                        dmin = dmin - habili.reduc
                 if habili.item_cost > 0:
                     items = invent.objects.filter(char_id=habili.char_id)
                     for item in items:
                         if item.nome == habili.item_cost_name:
-                            item.qtd = item.qtd - habili.item_cost
-                            item.save()
+                            if item.qtd >= habili.item_cost:
+                                item.qtd = item.qtd - habili.item_cost
+                                item.save()
                 if result >= dmin:
                     if habili.tipo == "summon":
                         load_minion = minion.objects.get(skill_id__id=habili.id)
                         minion_stage.objects.create(nome=load_minion.nome, hp=load_minion.hp, base_hp=load_minion.base_hp, char=perso.id, minion_id=load_minion.id, skill_id=load_minion.skill_id)
+                    elif habili.tipo == "transform":
+                        perso.max_hp = perso.max_hp + habili.bonus_hp
+                        perso.hp = perso.hp + habili.bonus_hp
+                        perso.reduc = perso.reduc + habili.reduc
+                        perso.save()
                     if habili.max_use != 0:
                         habili.max_use_corrent = habili.max_use_corrent - 1
                         habili.save()
@@ -521,8 +553,8 @@ def detalhes(request, identificador):
                             cura = int(abs(habili.dano))
                             for dude in party:
                                 hp = dude.hp + cura
-                                if hp > dude.base_hp:
-                                    hp = dude.base_hp
+                                if hp > dude.max_hp:
+                                    hp = dude.max_hp
                                 dude.hp = hp
                                 dude.save()
                         msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Cura: "+str(abs(habili.dano))+")"
