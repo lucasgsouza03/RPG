@@ -329,15 +329,15 @@ def perfil_inimigo(request):
             else:
                 enemy_stage.objects.create(nome=load_enemy.nome, hp=load_enemy.hp, hp_base=load_enemy.hp_base, esquiva=load_enemy.esquiva, block=load_enemy.block, dmin=load_enemy.dmin)
         elif Dano != "0":
-            stage = enemy_stage.objects.get(id=inimigo)
+            stage = enemy_stage.objects.get(id=int(inimigo))
             stage.hp = stage.hp - int(Dano)
             if stage.hp <= 0:
-                stage = enemy_stage.objects.filter(id=inimigo).delete()
+                stage = enemy_stage.objects.filter(id=int(inimigo)).delete()
 
             else:
                 stage.save()
         elif Cura != "0":
-            stage = enemy_stage.objects.get(id=inimigo)
+            stage = enemy_stage.objects.get(id=int(inimigo))
             stage.hp = stage.hp + int(Cura)
             if stage.hp > stage.hp_base:
                 stage.hp = stage.hp_base
@@ -445,6 +445,9 @@ def detalhes(request, identificador):
     for i in minions:
         if i.nome != None:
             vali = "minion"
+    draconideo = skill.objects.get(nome="Florescer Dracônico")
+    if draconideo.duracao_corrent > 0:
+        vali = "tranformed"
     if request.POST:
         n = request.POST.get("dado")
         pala = request.POST.get("skill")
@@ -501,22 +504,7 @@ def detalhes(request, identificador):
                         por.fist_turn = 1
                         por.save()
             elif habili.estamina <= perso.estamina:
-                if habili.nome == "Barreira Redentora":
-                    other_habili = skill.objects.get(nome="Barreira-LD-16")
-                    other_habili.duracao_corrent = 0
-                    other_habili.cd_corrent = 0
-                    other_habili.save()
-                elif habili.bonus_cost != 0:
-                    perso.hp = perso.hp - habili.bonus_cost
-                    perso.save()
-                perso.estamina = perso.estamina - habili.estamina
-                perso.save()
-                dmin = perso.dmin - perso.reduc
-                if habili.tipo != "transform":
-                    if reduc:
-                        dmin = dmin - int(reduc)
-                    else:
-                        dmin = dmin - habili.reduc
+                item_vali = True
                 if habili.item_cost > 0:
                     items = invent.objects.filter(char_id=habili.char_id)
                     for item in items:
@@ -524,113 +512,152 @@ def detalhes(request, identificador):
                             if item.qtd >= habili.item_cost:
                                 item.qtd = item.qtd - habili.item_cost
                                 item.save()
-                if result >= dmin:
-                    if habili.tipo == "summon":
-                        load_minion = minion.get.objects(skill_id_=habili.id)
-                        minion_stage.objects.create(nome=load_minion.nome, hp=load_minion.hp, base_hp=load_minion.base_hp, char=perso.id, minion_id=load_minion.id, skill_id=load_minion.skill_id)
-                    elif habili.tipo == "transform":
-                        perso.max_hp = perso.max_hp + habili.bonus_hp
-                        perso.hp = perso.hp + habili.bonus_hp
-                        perso.reduc = perso.reduc + habili.reduc
+                            else:
+                                item_vali = False
+                                break
+                if item_vali == True:
+                    if habili.nome == "Barreira Redentora":
+                        other_habili = skill.objects.get(nome="Barreira LD-16")
+                        other_habili.duracao_corrent = 0
+                        other_habili.cd_corrent = 0
+                        other_habili.save()
+                    elif habili.bonus_cost != 0:
+                        perso.hp = perso.hp - habili.bonus_cost
                         perso.save()
-                    if habili.tipo == "quickskill":
-                        mat_prim = invent.objects.get(nome="Matéria Prima")
-                        muni = invent.objects.get(nome="Munição")       
-                        muni_espec = invent.objects.get(nome="Munição especial")                 
-                        if habili.nome == "Engenheiro especialista":
-                            armazem = invent.objects.get(nome="Armazem")                            
-                            dispo = invent.objects.get(nome="Dispositivos")                            
-                            dispo.qtd += 20
+                    perso.estamina = perso.estamina - habili.estamina
+                    perso.save()
+                    dmin = perso.dmin - perso.reduc
+                    if habili.tipo != "transform":
+                        if reduc:
+                            dmin = dmin - int(reduc)
+                        else:
+                            dmin = dmin - habili.reduc
+                    if result >= dmin:
+                        if habili.tipo == "summon":
+                            load_minion = minion.objects.get(skill_id=habili.id)
+                            minion_stage.objects.create(nome=load_minion.nome, hp=load_minion.hp, base_hp=load_minion.base_hp, char=perso.id, minion_id=load_minion.id, skill_id=load_minion.skill_id)
+                        elif habili.tipo == "transform":
+                            perso.max_hp = perso.max_hp + habili.bonus_hp
+                            perso.hp = perso.hp + habili.bonus_hp
+                            perso.reduc = perso.reduc - 2
+                            perso.save()
+                        if habili.tipo == "quickskill":
+                            mat_prim = invent.objects.get(nome="Matéria Prima")
+                            muni = invent.objects.get(nome="Munição")       
+                            muni_espec = invent.objects.get(nome="Munição especial")                 
+                            if habili.nome == "Engenheiro Especialista":
+                                armazem = invent.objects.get(nome="Armazem")
+                                dispo = invent.objects.get(nome="Dispositivos")
+                                dispo.qtd += 20
+                                if dispo.qtd > dispo.limit_qtd:
+                                    sobra = dispo.qtd - dispo.limit_qtd
+                                    dispo.qtd = dispo.limit_qtd
+                                    armazem.qtd += sobra
+                                    armazem.save()
+                                dispo.save()
+                            elif habili.nome == "Proficiência em Alquimia":
+                                if result <= 14:
+                                    mat_prim.qtd += 5
+                                elif result >= 15 and result <= 19:
+                                    mat_prim.qtd += 10
+                                else:
+                                    mat_prim.qtd += 15
+                                mat_prim.save()
+                            elif habili.nome == "Craft":
+                                mat_prim.qtd -= 1
+                                muni_espec.qtd += 1
+                                muni.qtd += 5
+                                mat_prim.save()
+                                muni_espec.save()
+                                muni.save()
+                        if habili.max_use != 0:
+                            habili.max_use_corrent = habili.max_use_corrent - 1
+                            habili.save()
+                        if habili.duracao:
+                            if habili.duracao_corrent == 0 and habili.cd_corrent == 0:
+                                skill.objects.filter(id=int(hab)).update(cd_corrent=habili.duracao,duracao_corrent=habili.duracao,fist_turn=1)                        
+                        else:
+                            porra = skill.objects.filter(identificador=identify)
+                            for por in porra:
+                                por.cd_corrent = habili.cd
+                                por.fist_turn = 1
+                                por.save()
+                        if habili.nome == "Geomancia de Guerra":
+                            dispo = invent.objects.get(nome="Dispositivos")
+                            armazem = invent.objects.get(nome="Armazem")
+                            if result >= 15:
+                                dispo.qtd += 3
+                            else:
+                                dispo.qtd += 1
                             if dispo.qtd > dispo.limit_qtd:
                                 sobra = dispo.qtd - dispo.limit_qtd
                                 dispo.qtd = dispo.limit_qtd
                                 armazem.qtd += sobra
                                 armazem.save()
                             dispo.save()
-                        elif habili.nome == "Proficiência em Alquimia":
-                            if result <= 14:
-                                mat_prim.qtd += 5
-                            elif result >= 15 and result <= 19:
-                                mat_prim.qtd += 10
-                            else:
-                                mat_prim.qtd += 15
-                            mat_prim.save()
-                        elif habili.nome == "Craft":
-                            mat_prim.qtd -= 1
-                            muni_espec.qtd += 1
-                            muni.qtd += 5
-                            mat_prim.save()
-                            muni_espec.save()
-                            muni.save()
-                    if habili.max_use != 0:
-                        habili.max_use_corrent = habili.max_use_corrent - 1
-                        habili.save()
-                    if habili.duracao:
-                        if habili.duracao_corrent == 0 and habili.cd_corrent == 0:
-                            skill.objects.filter(id=int(hab)).update(cd_corrent=habili.duracao,duracao_corrent=habili.duracao,fist_turn=1)                        
-                    else:
-                        porra = skill.objects.filter(identificador=identify)
-                        for por in porra:
-                            por.cd_corrent = habili.cd
-                            por.fist_turn = 1
-                            por.save()
-                    if result >= perso.dcrit:
-                        habili.dano = habili.dano * 2                                   
-                    if habili.dano < 0:
-                        if habili.nome == "Cura Elfica":
-                            party = char.objects.all()
-                            cura = int(abs(habili.dano))
-                            for dude in party:
-                                hp = dude.hp + cura
-                                if hp > dude.max_hp:
-                                    hp = dude.max_hp
-                                dude.hp = hp
-                                dude.save()
-                        msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Cura: "+str(abs(habili.dano))+")"
-                    elif bonus:
-                        db = habili.dano + habili.bonus_dano
-                        if perso.nome == "Mardek Dragneel":
+                        if result >= perso.dcrit:
+                            habili.dano = habili.dano * 2                                   
+                        if habili.dano < 0:
+                            if habili.nome == "Cura Elfica":
+                                party = char.objects.all()
+                                cura = int(abs(habili.dano))
+                                for dude in party:
+                                    hp = dude.hp + cura
+                                    if hp > dude.max_hp:
+                                        hp = dude.max_hp
+                                    dude.hp = hp
+                                    dude.save()
+                            msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Cura: "+str(abs(habili.dano))+")"
+                        elif bonus:
+                            db = habili.dano + habili.bonus_dano
+                            if perso.nome == "Mardek Dragneel":
+                                m = minion_stage.objects.filter(char=perso.id)
+                                for i in m:
+                                    if i.hp > habili.bonus_cost:
+                                        i.hp = i.hp - habili.bonus_cost
+                                        i.save()
+                                        if debuff:
+                                            db = db * 2
+                                            debuf.objects.filter(id=int(debuff)).update(duracao=0)
+                                        msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(db)+")"
+                                    else:    
+                                        log.objects.create(tipo="ERROR", mensagem="Invocação no contem vida suficiente para utilizar o bônus da Skill "+ habili.nome)
+                            msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(db)+")"
+                        else:
+                            if debuff:
+                                if perso.nome == 'Mandrake Satawin' and reduc != None:
+                                    habili.dano = habili.dano * 3
+                                    print(habili.dano)
+                                else:
+                                    habili.dano = habili.dano * 2
+                                    print(habili.dano)
+                                debuf.objects.filter(id=int(debuff)).update(duracao=0)
+                            msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(habili.dano)+")"
+                            
+                        log.objects.create(tipo="SKILL", mensagem=msg)
+                    elif result < dmin:
+                        if habili.max_use != 0:
+                            habili.max_use_corrent = habili.max_use_corrent - 1
+                            habili.save()
+                        if bonus:
                             m = minion_stage.objects.filter(char=perso.id)
                             for i in m:
-                                if i.hp > habili.bonus_cost:
-                                    i.hp = i.hp - habili.bonus_cost
-                                    i.save()
-                                    if debuff:
-                                        db = db * 2
-                                        debuf.objects.filter(id=int(debuff)).update(duracao=0)
-                                    msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(db)+")"
-                                else:    
-                                    log.objects.create(tipo="ERROR", mensagem="Invocação no contem vida suficiente para utilizar o bônus da Skill "+ habili.nome)
-                    else:
-                        if debuff:
-                            if perso.nome == 'Mandrake Satawin' and reduc != None:
-                                habili.dano = habili.dano * 3
-                                print(habili.dano)
-                            else:
-                                habili.dano = habili.dano * 2
-                                print(habili.dano)
-                            debuf.objects.filter(id=int(debuff)).update(duracao=0)
-                        msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(habili.dano)+")"
-                        
-                    log.objects.create(tipo="SKILL", mensagem=msg)
-                elif result < dmin:
-                    if habili.max_use != 0:
-                        habili.max_use_corrent = habili.max_use_corrent - 1
-                        habili.save()
-                    if bonus:
-                        m = minion_stage.objects.filter(char=perso.id)
-                        for i in m:
-                            i.hp = i.hp - habili.bonus_cost
-                            i.save()
-                    skill.objects.filter(id=int(hab)).update(cd_corrent=habili.cd,fist_turn=1)
-                    msg = str(perso.nome)+" falha ao utilizar "+str(habili.nome)
-                    log.objects.create(tipo="SKILL", mensagem=msg)
+                                i.hp = i.hp - habili.bonus_cost
+                                i.save()
+                        skill.objects.filter(id=int(hab)).update(cd_corrent=habili.cd,fist_turn=1)
+                        msg = str(perso.nome)+" falha ao utilizar "+str(habili.nome)
+                        log.objects.create(tipo="SKILL", mensagem=msg)
+                else:
+                    log.objects.create(tipo="ERROR", mensagem=f"Quantidade de {habili.item_cost_name} insuficiente!")
             else:
                 log.objects.create(tipo="ERROR", mensagem="Estaminha insuficiente para utilizar a Skill "+ habili.nome)
         minions = minion_stage.objects.filter(char=perso.id)
         for i in minions:
             if i.nome != None:
                 vali = "minion"
+        draconideo = skill.objects.get(nome="Florescer Dracônico")
+        if draconideo.duracao_corrent > 0:
+            vali = "tranformed"
             
         contexto = {
             "resultado": result,

@@ -51,7 +51,7 @@ body{
     display: block;
     background-color: #fff;
     border: 2px solid;
-    width: 40%;
+    width: 70%;
     padding: 1%;
     font-size: 20px;
     background-image: url(tabela.jpg);
@@ -147,7 +147,7 @@ label.skill{
     height: 100%;
     padding: 1%;
     border: 2px outset;
-    margin:2%;
+    margin:1%;
 }
 .skill_passiva{
     background-color: #fff;

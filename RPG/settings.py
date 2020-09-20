@@ -86,7 +86,7 @@ with open('\home\data\mysql\MYSQLCONNSTR_localdb.txt') as arquivo:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'game_dev',
+        'NAME': 'liber_summa',
         'USER': 'root',
         'PASSWORD': 'Z3ld4100%',
         'HOST': 'localhost',

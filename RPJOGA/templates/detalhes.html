@@ -111,10 +111,10 @@
                                 </label>
                             
                             {% if vali != null %}
-                                {% if skill.tipo == "skill" %}
-                                    <br><label><input type="checkbox" name="bonus" value="{{ skill.id }}"><b style="color:rgb(252, 0, 0);">Bônus Igni</b>
+                                {% if skill.tipo == "skill" and skill.bonus_dano > 0 %}
+                                    <br><label><input type="checkbox" name="bonus" value="{{ skill.id }}"><b style="color:rgb(252, 0, 0);">Bônus Draconídeo</b>
                                     <br>
-                                    ({{ skill.bonus_cost }})
+                                    ({{ skill.bonus_dano }})
                                     </label>
                                 {% endif %}
                             {% endif %}
