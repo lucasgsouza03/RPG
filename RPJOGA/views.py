@@ -96,6 +96,14 @@ def perfil(request):
                         elif i.duracao_corrent == 1:
                             current_duracao = i.duracao_corrent - 1
                             i.duracao_corrent = current_duracao
+                            if i.dano_mod > 0:
+                                mod_s = skill.objects.get(id=i.s_d_m_id)
+                                mod_s.dano = mod_s.dano - i.dano_mod
+                                mod_s.save()
+                            if i.dcrit_mid > 0:
+                                fulano = char.objects.get(id=i.char_id)
+                                fulano.dcrit += i.dcrit_mid
+                                fulano.save()
                             if i.tipo == "summon":
                                 minion_stage.objects.get(skill_id=i.id).delete()
                             elif i.tipo == "transform":
@@ -163,9 +171,10 @@ def perfil(request):
             log.objects.create(tipo="ACTION", mensagem=msg)
         elif restore:
             skills = skill.objects.all()
-            minions = minion_stage.objects.all().delete()
+            minion_stage.objects.all().delete()
             minion_skills = minion_skill.objects.all()
             debuff = debuf.objects.filter(id=1)
+            valid_skills = {}
             for i in debuff:
                 i.duracao = 0
                 i.save()
@@ -178,6 +187,7 @@ def perfil(request):
                 i.duracao_corrent = 0
                 i.fist_turn = 0
                 i.max_use_corrent = i.max_use
+                i.dano = i.dano_base
                 if i.tipo == "transform":
                     personagem = char.objects.get(id=i.char_id)
                     personagem.max_hp = personagem.base_hp
@@ -185,6 +195,10 @@ def perfil(request):
                         personagem.hp = personagem.max_hp
                     personagem.reduc = 0
                     personagem.save()
+                if i.dcrit_mid > 0:
+                    fulano = char.objects.get(id=i.char_id)
+                    fulano.dcrit = fulano.dcrit_base
+                    fulano.save()
                 i.save()
             for i in minion_skills:
                 i.cd_corrent = 0
@@ -269,6 +283,10 @@ def perfil(request):
                     m_skill = skill.objects.get(id=info.skill_id)
                     m_skill.duracao_corrent = 0
                     m_skill.cd_corrent = m_skill.cd
+                    if m_skill.dano_mod > 0:
+                        mod_s = skill.objects.get(id=m_skill.s_d_m_id)
+                        mod_s.dano = mod_s.dano - m_skill.dano_mod
+                        mod_s.save()
                     m_skill.save()
                     info.delete()
                     msg = str(dude.nome)+" morre ao receber "+str(Dano)+" de dano"
@@ -397,8 +415,11 @@ def create_skill(request):
         item_cost = request.POST.get("item_cost")
         item_cost_name = request.POST.get("item_cost_name")
         bonus_hp = request.POST.get("bonus_hp")
+        dano_mod = request.POST.get("dano_mod")
+        dcrit_mid = request.POST.get("dcrit_mid")
+        s_d_m_id = request.POST.get("s_d_m_id")
         if aliado:
-            skill.objects.create(nome=nome, identificador=identificador, cd=cd, duracao=duracao, reduc=reduc, dano=dano, char_id=aliado, tipo=tipo, max_use=max_use, max_use_corrent=max_use, estamina=estamina, bonus_dano=dano_bonus, bonus_cost=cost_bonus, item_cost=item_cost, item_cost_name=item_cost_name, bonus_hp=bonus_hp)
+            skill.objects.create(nome=nome, identificador=identificador, cd=cd, duracao=duracao, reduc=reduc, dano=dano, char_id=aliado, tipo=tipo, max_use=max_use, max_use_corrent=max_use, estamina=estamina, bonus_dano=dano_bonus, bonus_cost=cost_bonus, item_cost=item_cost, item_cost_name=item_cost_name, bonus_hp=bonus_hp,dano_base=dano,dano_mod=dano_mod,dcrit_mid=dcrit_mid,s_d_m_id=s_d_m_id)
         elif inimigo:
             enemy_skill.objects.create(nome=nome, cd=cd, duracao=duracao, reduc=reduc, dano=dano, enemy_id=inimigo)
         elif minions:
@@ -573,6 +594,13 @@ def detalhes(request, identificador):
                         if habili.max_use != 0:
                             habili.max_use_corrent = habili.max_use_corrent - 1
                             habili.save()
+                        if habili.dano_mod > 0:
+                            mod_s = skill.objects.get(id=habili.s_d_m_id)
+                            mod_s.dano += habili.dano_mod
+                            mod_s.save()
+                        if habili.dcrit_mid > 0:
+                            perso.dcrit -= habili.dcrit_mid
+                            perso.save()
                         if habili.duracao:
                             if habili.duracao_corrent == 0 and habili.cd_corrent == 0:
                                 skill.objects.filter(id=int(hab)).update(cd_corrent=habili.duracao,duracao_corrent=habili.duracao,fist_turn=1)                        
@@ -596,7 +624,10 @@ def detalhes(request, identificador):
                                 armazem.save()
                             dispo.save()
                         if result >= perso.dcrit:
-                            habili.dano = habili.dano * 2                                   
+                            bosta = skill.objects.get(nome="Stealth")
+                            habili.dano = habili.dano * perso.crit_s
+                            if bosta.duracao_corrent > 0:
+                                habili.dano += 50
                         if habili.dano < 0:
                             if habili.nome == "Cura Elfica":
                                 party = char.objects.all()
@@ -633,9 +664,26 @@ def detalhes(request, identificador):
                                     print(habili.dano)
                                 debuf.objects.filter(id=int(debuff)).update(duracao=0)
                             msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(habili.dano)+")"
-                            
+                        if habili.identificador == "AAB":
+                            stelf = skill.objects.get(nome="Stealth")
+                            if stelf.duracao_corrent > 0:
+                                stelf.duracao_corrent = 0
+                                stelf.cd_corrent = stelf.cd
+                                stelf.save()
+                                fulano = char.objects.get(id=stelf.char_id)
+                                fulano.dcrit += stelf.dcrit_mid
+                                fulano.save()  
                         log.objects.create(tipo="SKILL", mensagem=msg)
                     elif result < dmin:
+                        if habili.identificador == "AAB":
+                            stelf = skill.objects.get(nome="Stealth")
+                            if stelf.duracao_corrent > 0:
+                                stelf.duracao_corrent = 0
+                                stelf.cd_corrent = stelf.cd
+                                stelf.save()
+                                fulano = char.objects.get(id=stelf.char_id)
+                                fulano.dcrit += stelf.dcrit_mid
+                                fulano.save()
                         if habili.max_use != 0:
                             habili.max_use_corrent = habili.max_use_corrent - 1
                             habili.save()

@@ -21,7 +21,9 @@ class char(models.Model):
     base_estamina = models.IntegerField()
     dmin = models.IntegerField(blank=True, null=True)
     dcrit = models.IntegerField(blank=True, null=True)
+    dcrit_base = models.IntegerField(blank=True, null=True, default=0)
     reduc = models.IntegerField(default=0)
+    crit_s = models.IntegerField(default=2)
 
     class Meta:
         db_table = "perfil"
@@ -78,6 +80,7 @@ class skill(models.Model):
     max_use_corrent = models.IntegerField(default = 0)
     fist_turn = models.IntegerField(default = 0)
     dano = models.IntegerField(blank = True)
+    dano_base = models.IntegerField(blank = True, default = 0)
     bonus_dano = models.IntegerField(null=True, blank = True)
     bonus_cost = models.IntegerField(null=True, blank = True)
     estamina = models.IntegerField(blank = True)
@@ -87,6 +90,9 @@ class skill(models.Model):
     item_cost = models.IntegerField(default=0)
     item_cost_name = models.CharField(max_length=150, blank=True, null=True)
     bonus_hp = models.IntegerField(default=0)
+    dano_mod = models.IntegerField(default=0)
+    dcrit_mid = models.IntegerField(default=0)
+    s_d_m_id = models.IntegerField(default=0)
 
     class Meta:
         db_table = "skill"
