@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "d:\\pvm\\rpg\\Scripts\\python.exe"
+    "python.pythonPath": "d:\\pvm\\rpg\\Scripts\\python.exe",
+    "python.dataScience.jupyterServerURI": "local"
 }

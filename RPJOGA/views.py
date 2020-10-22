@@ -664,7 +664,7 @@ def detalhes(request, identificador):
                                     print(habili.dano)
                                 debuf.objects.filter(id=int(debuff)).update(duracao=0)
                             msg = str(perso.nome)+" teve sucesso ao utilizar "+str(habili.nome)+"(Dano: "+str(habili.dano)+")"
-                        if habili.identificador == "AAB":
+                        if habili.identificador == "AAA":
                             stelf = skill.objects.get(nome="Stealth")
                             if stelf.duracao_corrent > 0:
                                 stelf.duracao_corrent = 0
@@ -675,7 +675,7 @@ def detalhes(request, identificador):
                                 fulano.save()  
                         log.objects.create(tipo="SKILL", mensagem=msg)
                     elif result < dmin:
-                        if habili.identificador == "AAB":
+                        if habili.identificador == "AAA":
                             stelf = skill.objects.get(nome="Stealth")
                             if stelf.duracao_corrent > 0:
                                 stelf.duracao_corrent = 0
